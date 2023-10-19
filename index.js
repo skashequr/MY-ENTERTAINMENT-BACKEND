@@ -81,6 +81,20 @@ async function run() {
       }
     });
     
+
+    app.get("/:brandName/:details", async (req, res) => {
+      const details = req.params.details;
+      const query = { name: details }; // Use a string-based query
+      try {
+        const result = await productCollection.find(query).toArray();
+        res.send(result);
+      } catch (error) {
+        res.status(500).send("Internal Server Error: " + error.message);
+      }
+    });
+    
+    
+    
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
