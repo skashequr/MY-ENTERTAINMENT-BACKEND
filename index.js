@@ -149,7 +149,40 @@ async function run() {
       }
     });
     
-    
+
+    app.put('/id/:iddetails/:update', async (req, res) => {
+      const update = req.params.update;
+      const filter = { _id: new ObjectId(update) };
+      const updatedData = req.body;
+      const updated = {
+          $set: {
+              name: updatedData.name,
+              brandName: updatedData.brandName,
+              price: updatedData.price,
+              shortDescription: updatedData.shortDescription,
+              image: updatedData.image,
+              rating: updatedData.rating
+          }
+      };
+  
+      try {
+          const result = await productCollection.updateOne(filter, updated);
+          res.json(result);
+      } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Internal Server Error' });
+      }
+  });
+  
+
+
+    app.delete("/myCart/:email/:id", async(req,res)=>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await userAddedDataCollection.deleteOne(query);
+      res.send(result)
+    })
+
     
     
     // Send a ping to confirm a successful connection
