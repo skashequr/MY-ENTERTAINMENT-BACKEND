@@ -33,7 +33,7 @@ async function run() {
 
     const productCollection = client.db("myDB").collection("productsDB");
     const categoriesCollection = client.db("myDB").collection("categorieDB");
-
+    const userAddedDataCollection = client.db("myDB").collection("userAddedData");
     app.use(express.json());
 
     app.post("/product", async (req, res) => {
@@ -42,6 +42,42 @@ async function run() {
       res.send(result);
       console.log(newProduct);
     });
+
+
+    app.post("/myproducts",async(req,res)=>{
+      const addedProudects = req.body;
+      console.log(addedProudects);
+      const result = await userAddedDataCollection.insertOne(addedProudects);
+      res.send(result)
+      
+    })
+    
+
+    app.get("/myproducts", async (req, res) => {
+      const email = req.query.email;
+      const addedProudects = req.body;
+      // console.log(addedProudects);
+        // Perform a find operation to get data by email
+        const query = { email: email };
+        const result = await userAddedDataCollection.find(query).toArray();
+    
+        res.send(result);
+     
+    });
+
+
+    app.get('/myCard/:email', async (req, res) => {
+      try {
+        const email = req.params.email;
+        const query = { email: email }; // Define the query object to match the email field
+        const result = await userAddedDataCollection.find(query).toArray();
+        res.json(result);
+      } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    });
+
 
     app.get("/product",async (req,res)=>{
       const cursor = productCollection.find();
@@ -92,6 +128,19 @@ async function run() {
         res.status(500).send("Internal Server Error: " + error.message);
       }
     });
+    
+    app.get("/:brandName/:details/:update", async (req, res) => {
+      try {
+        const details = req.params.details;
+        const query = { name: details };
+        const result = await productCollection.find(query).toArray();
+        res.send(result);
+      } catch (error) {
+        console.error("Error in database query:", error);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+    
     
     
     
