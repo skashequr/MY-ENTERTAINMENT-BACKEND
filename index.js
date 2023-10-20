@@ -53,23 +53,30 @@ async function run() {
     })
     
 
-    app.get("/myproducts", async (req, res) => {
-      const email = req.query.email;
-      const addedProudects = req.body;
-      // console.log(addedProudects);
-        // Perform a find operation to get data by email
-        const query = { email: email };
-        const result = await userAddedDataCollection.find(query).toArray();
+    // app.get("/myproducts", async (req, res) => {
+    //   const email = req.query.email;
+    //   const addedProudects = req.body;
+    //   // console.log(addedProudects);
+    //     // Perform a find operation to get data by email
+    //     const query = { email: email };
+    //     const result = await userAddedDataCollection.find(query).toArray();
     
-        res.send(result);
+    //     res.send(result);
      
+    // });
+
+    app.post('/myproducts', async (req, res) => {
+      const addedProduct = req.body;
+      const userEmail = user.email; // Assuming you have the user's email from authentication
+      addedProduct.email = userEmail; // Add the user's email to the data
+      const result = await userAddedDataCollection.insertOne(addedProduct);
+      res.send(result);
     });
-
-
+    
     app.get('/myCard/:email', async (req, res) => {
       try {
-        const email = req.params.email;
-        const query = { email: email }; // Define the query object to match the email field
+        const userEmail = req.params.email; // User provides their email in the URL
+        const query = { email: userEmail };
         const result = await userAddedDataCollection.find(query).toArray();
         res.json(result);
       } catch (error) {
@@ -77,6 +84,7 @@ async function run() {
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
+    
 
 
     app.get("/product",async (req,res)=>{
